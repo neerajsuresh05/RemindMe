@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">RemindMe</string>
+    <string-array name="repeat_options">
+        <item>Once</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+    </string-array>
+</resources>
+
