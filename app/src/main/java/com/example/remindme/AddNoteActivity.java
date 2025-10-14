@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class AddNoteActivity extends AppCompatActivity {
 
-    EditText editNote;
-    Button btnSave;
+    EditText editNoteContent;
+    Button btnSaveNote;
     JournalDatabaseHelper db;
 
     @Override
@@ -15,22 +15,28 @@ public class AddNoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
 
-        editNote = findViewById(R.id.editNote);
-        btnSave = findViewById(R.id.btnSaveNote);
+        // Link views with XML
+        editNoteContent = findViewById(R.id.editNoteContent);
+        btnSaveNote = findViewById(R.id.btnSaveNote);
+
         db = new JournalDatabaseHelper(this);
 
-        btnSave.setOnClickListener(v -> saveNote());
+        btnSaveNote.setOnClickListener(v -> saveNote());
     }
 
     private void saveNote() {
-        String content = editNote.getText().toString().trim();
+        String content = editNoteContent.getText().toString().trim();
+
         if (content.isEmpty()) {
             Toast.makeText(this, "Please write some note", Toast.LENGTH_SHORT).show();
             return;
         }
 
         long timestamp = System.currentTimeMillis();
+
+        // Save only content and timestamp
         db.addNote(content, timestamp);
+
         Toast.makeText(this, "Note saved", Toast.LENGTH_SHORT).show();
         finish();
     }
