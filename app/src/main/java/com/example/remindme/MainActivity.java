@@ -14,34 +14,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);  // your existing layout
+        setContentView(R.layout.activity_main);
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        // Set default fragment on launch
-        if (savedInstanceState == null) {
+        if(savedInstanceState == null){
             loadFragment(new RemindersFragment());
         }
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment fragment = null;
-                switch (item.getItemId()) {
-                    case R.id.menu_reminders:
-                        fragment = new RemindersFragment();
-                        break;
-                    case R.id.menu_journal:
-                        fragment = new JournalFragment();
-                        break;
-                }
-                return loadFragment(fragment);
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            Fragment fragment = null;
+            switch(item.getItemId()){
+                case R.id.menu_reminders:
+                    fragment = new RemindersFragment();
+                    break;
+                case R.id.menu_journal:
+                    fragment = new JournalFragment();
+                    break;
             }
+            return loadFragment(fragment);
         });
     }
 
-    private boolean loadFragment(Fragment fragment) {
-        if (fragment != null) {
+    private boolean loadFragment(Fragment fragment){
+        if(fragment != null){
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment)

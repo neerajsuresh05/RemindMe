@@ -10,4 +10,8 @@ public class Note {
         this.content = content;
         this.timestamp = timestamp;
     }
+
+    public int getId() { return id; }
+    public String getContent() { return content; }
+    public long getTimestamp() { return timestamp; }
 }

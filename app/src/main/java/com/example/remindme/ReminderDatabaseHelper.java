@@ -34,39 +34,75 @@ public class ReminderDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // For now simply drop and recreate
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_REMINDERS);
         onCreate(db);
     }
 
+    // Add reminder
     public int addReminder(String title, long timeMillis, String repeat) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COL_TITLE, title);
         cv.put(COL_TIME, timeMillis);
         cv.put(COL_REPEAT, repeat);
-
         long id = db.insert(TABLE_REMINDERS, null, cv);
         db.close();
         return (int) id;
     }
 
+    // Get all reminders
     public List<Reminder> getAllReminders() {
         List<Reminder> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_REMINDERS + " ORDER BY " + COL_TIME + " ASC", null);
 
-        if (cursor.moveToFirst()) {
+        if(cursor.moveToFirst()){
             do {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID));
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(COL_TITLE));
                 long timeMillis = cursor.getLong(cursor.getColumnIndexOrThrow(COL_TIME));
                 String repeat = cursor.getString(cursor.getColumnIndexOrThrow(COL_REPEAT));
                 list.add(new Reminder(id, title, timeMillis, repeat));
-            } while (cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
+
         cursor.close();
         db.close();
         return list;
+    }
+
+    // Get single reminder
+    public Reminder getReminderById(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_REMINDERS, null, COL_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
+        if(cursor != null && cursor.moveToFirst()){
+            String title = cursor.getString(cursor.getColumnIndexOrThrow(COL_TITLE));
+            long timeMillis = cursor.getLong(cursor.getColumnIndexOrThrow(COL_TIME));
+            String repeat = cursor.getString(cursor.getColumnIndexOrThrow(COL_REPEAT));
+            cursor.close();
+            db.close();
+            return new Reminder(id, title, timeMillis, repeat);
+        }
+        db.close();
+        return null;
+    }
+
+    // Update reminder
+    public int updateReminder(int id, String title, long timeMillis, String repeat){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_TITLE, title);
+        cv.put(COL_TIME, timeMillis);
+        cv.put(COL_REPEAT, repeat);
+        int rows = db.update(TABLE_REMINDERS, cv, COL_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+        return rows;
+    }
+
+    // Delete reminder
+    public void deleteReminder(int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_REMINDERS, COL_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
     }
 }

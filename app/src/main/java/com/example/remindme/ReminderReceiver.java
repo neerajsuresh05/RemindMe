@@ -18,7 +18,8 @@ public class ReminderReceiver extends BroadcastReceiver {
         createNotificationChannel(context);
 
         Intent activityIntent = new Intent(context, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, activityIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
@@ -32,16 +33,17 @@ public class ReminderReceiver extends BroadcastReceiver {
         manager.notify((int) System.currentTimeMillis(), builder.build());
     }
 
-    private void createNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    private void createNotificationChannel(Context context){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             CharSequence name = "Reminder Channel";
             String description = "Channel for Reminder notifications";
             int importance = NotificationManager.IMPORTANCE_HIGH;
+
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
 
-            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            NotificationManager manager = context.getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
         }
     }
 }

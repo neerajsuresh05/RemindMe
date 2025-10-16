@@ -23,7 +23,6 @@ public class JournalDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Notes table creation
         String createNotesTable = "CREATE TABLE " + TABLE_NOTES + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_CONTENT + " TEXT, " +
@@ -33,11 +32,11 @@ public class JournalDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // For now drop & recreate notes table only
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
         onCreate(db);
     }
 
+    // Add note
     public long addNote(String content, long timestamp) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -48,6 +47,7 @@ public class JournalDatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    // Get all notes
     public List<Note> getAllNotes() {
         List<Note> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -64,5 +64,38 @@ public class JournalDatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return list;
+    }
+
+    // Get single note
+    public Note getNoteById(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NOTES, null, COL_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            String content = cursor.getString(cursor.getColumnIndexOrThrow(COL_CONTENT));
+            long timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(COL_TIMESTAMP));
+            cursor.close();
+            db.close();
+            return new Note(id, content, timestamp);
+        }
+        db.close();
+        return null;
+    }
+
+    // Update note
+    public int updateNote(int id, String content, long timestamp) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_CONTENT, content);
+        cv.put(COL_TIMESTAMP, timestamp);
+        int rows = db.update(TABLE_NOTES, cv, COL_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+        return rows;
+    }
+
+    // Delete note
+    public void deleteNote(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NOTES, COL_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
     }
 }

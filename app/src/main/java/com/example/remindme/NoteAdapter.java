@@ -5,12 +5,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.text.*;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     private List<Note> notes;
+    private OnItemClickListener listener;
 
     public NoteAdapter(List<Note> notes) {
         this.notes = notes;
@@ -21,22 +21,37 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(Note note);
+        void onItemLongClick(Note note);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
-    public NoteAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_note, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NoteAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Note note = notes.get(position);
         holder.content.setText(note.content);
+        holder.timestamp.setText(DateFormat.getDateTimeInstance().format(new Date(note.timestamp)));
 
-        Date date = new Date(note.timestamp);
-        DateFormat df = DateFormat.getDateTimeInstance();
-        holder.timestamp.setText(df.format(date));
+        holder.itemView.setOnClickListener(v -> {
+            if(listener != null) listener.onItemClick(note);
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if(listener != null) listener.onItemLongClick(note);
+            return true;
+        });
     }
 
     @Override
